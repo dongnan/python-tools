@@ -30,26 +30,27 @@ def translate(words, showEg):
     data = json.loads(c.fp.getvalue())
     if 'dict_result' in data.keys():
         if 'simple_means' in data['dict_result'].keys():
-            if 'symbols' in data['dict_result']['simple_means'].keys():
-                if len(data['dict_result']['simple_means']['symbols']):
-                    ps = '[读音]'
-                    if 'ph_am' in data['dict_result']['simple_means']['symbols'][0].keys():
-                        ps += " [美]:" + data['dict_result']['simple_means']['symbols'][0]['ph_am']
-                    if 'ph_en' in data['dict_result']['simple_means']['symbols'][0].keys():
-                        ps += " [英]:" + data['dict_result']['simple_means']['symbols'][0]['ph_en']
-                    if 'ph_other' in data['dict_result']['simple_means']['symbols'][0].keys():
-                        ps += ' ' + data['dict_result']['simple_means']['symbols'][0]['ph_other']
+            if 'symbols' in data['dict_result']['simple_means'].keys() and isinstance(data['dict_result']['simple_means']['symbols'], types.ListType):
+                for symbols in data['dict_result']['simple_means']['symbols']:
+                    print '\n   "' + words + '"'
+                    ps = ' - [读音]'
+                    if 'ph_am' in symbols.keys() and symbols['ph_am'] is not None:
+                        ps += "  [美]:" + symbols['ph_am']
+                    if 'ph_en' in symbols.keys() and symbols['ph_en'] is not None:
+                        ps += "  [英]:" + symbols['ph_en']
+                    if 'ph_other' in symbols.keys() and symbols['ph_other'] is not None:
+                        ps += '  ' + symbols['ph_other']
                     print ps
-                    if 'parts' in data['dict_result']['simple_means']['symbols'][0].keys() and isinstance(
-                            data['dict_result']['simple_means']['symbols'][0]['parts'], types.ListType):
-                        for part in data['dict_result']['simple_means']['symbols'][0]['parts']:
-                            if 'part' in part and 'means' in part:
-                                print part['part'], ';'.join(part['means'])
+                    if 'parts' in symbols.keys() and isinstance(symbols['parts'], types.ListType):
+                        for part in symbols['parts']:
+                            if 'part' in part.keys() and 'means' in part.keys():
+                                print '   ' + part['part'], ';'.join(part['means'])
         if showEg:
-            if 'collins' in data['dict_result'].keys():
+            if 'collins' in data['dict_result'].keys() and data['dict_result']['collins'] is not None:
                 if 'entry' in data['dict_result']['collins'].keys() and isinstance(
                         data['dict_result']['collins']['entry'],
                         types.ListType):
+                    print "\n - - 例句 - -\n"
                     for entry in data['dict_result']['collins']['entry']:
                         if 'value' in entry.keys() and len(entry['value']):
                             for value in entry['value']:
@@ -64,31 +65,34 @@ def translate(words, showEg):
                                                 if 'tran' in example.keys() and 'ex' in example.keys():
                                                     print '        ' + example['tran']
                                                     print '        ' + example['ex']
+                                    print ''
             else:
-                print ' 没有查询到相关例句.'
+                print "\n - 没有查询到相关例句.\n"
 
 
 def usage():
+    print ""
     print "translate 是一个命令行翻译脚本,通过百度翻译接口获取翻译结果,并友好的输出"
-    print "使用方法: python translate.py hello 或 python translate.py 'What\'s your name' "
+    print "使用方法: python translate.py hello 或 python translate.py \"What's your name\" "
     print "  -h,  --help       显示帮助信息"
     print "  -v,  --version    显示版本"
     print "  -e,  --example    显示例句"
-
+    print ""
 
 opts, args = getopt.getopt(sys.argv[1:], "hve", ["help", "version", "example"])
 
+showEg = False
+for op, value in opts:
+    if op == "-h" or op == "--help":
+        usage()
+        sys.exit()
+    elif op == "-v" or op == "--version":
+        print "translate 当前版本:" + VERSION
+        sys.exit()
+    elif op == "-e" or op == "--example":
+        showEg = True
 if len(args):
-    showEg = True
-    for op, value in opts:
-        if op == "-h" or op == "--help":
-            usage()
-            sys.exit()
-        elif op == "-v" or op == "--version":
-            print "translate 当前版本:" + VERSION
-            sys.exit()
-        elif op == "-e" or op == "--example":
-            showEg = True
     translate(args[0], showEg)
 else:
     print '缺少要翻译的单词或语句'
+
