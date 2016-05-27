@@ -45,24 +45,27 @@ def translate(words, showEg):
                         for part in data['dict_result']['simple_means']['symbols'][0]['parts']:
                             if 'part' in part and 'means' in part:
                                 print part['part'], ';'.join(part['means'])
-    if showEg:
-        if 'collins' in data.keys() and data['collins'] is not None:
-            if 'entry' in data['collins'].keys() and isinstance(data['collins']['entry'], types.ListType):
-                for entry in data['collins']['entry']:
-                    if 'value' in entry.keys() and len(entry['value']):
-                        for value in entry['value']:
-                            if 'tran' in value.keys() and 'def' in value.keys() and 'mean_type' in value.keys() and len(
-                                    value['mean_type']):
-                                print ' - ' + value['tran']
-                                print '   ' + value['def']
-                                print '   例句:'
-                                for mean in value['mean_type']:
-                                    if 'example' in mean.keys():
-                                        if 'tran' in mean['example'].keys() and 'ex' in mean['example'].keys():
-                                            print '        ' + mean['example']['tran']
-                                            print '        ' + mean['example']['ex']
-        else:
-            print ' 没有查询到相关例句.'
+        if showEg:
+            if 'collins' in data['dict_result'].keys():
+                if 'entry' in data['dict_result']['collins'].keys() and isinstance(
+                        data['dict_result']['collins']['entry'],
+                        types.ListType):
+                    for entry in data['dict_result']['collins']['entry']:
+                        if 'value' in entry.keys() and len(entry['value']):
+                            for value in entry['value']:
+                                if 'tran' in value.keys() and 'def' in value.keys() and 'mean_type' in value.keys() and len(
+                                        value['mean_type']):
+                                    print ' - ' + value['tran']
+                                    print '   ' + value['def']
+                                    print '   例句:'
+                                    for mean in value['mean_type']:
+                                        if 'example' in mean.keys():
+                                            for example in mean['example']:
+                                                if 'tran' in example.keys() and 'ex' in example.keys():
+                                                    print '        ' + example['tran']
+                                                    print '        ' + example['ex']
+            else:
+                print ' 没有查询到相关例句.'
 
 
 def usage():
@@ -76,7 +79,7 @@ def usage():
 opts, args = getopt.getopt(sys.argv[1:], "hve", ["help", "version", "example"])
 
 if len(args):
-    showEg = False
+    showEg = True
     for op, value in opts:
         if op == "-h" or op == "--help":
             usage()
