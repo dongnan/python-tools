@@ -1,3 +1,4 @@
+#!/bin/env python
 # -*- coding: UTF-8 -*-
 
 import sys
@@ -30,14 +31,15 @@ def translate(words, showEg):
     data = json.loads(c.fp.getvalue())
     if 'dict_result' in data.keys():
         if 'simple_means' in data['dict_result'].keys():
-            if 'symbols' in data['dict_result']['simple_means'].keys() and isinstance(data['dict_result']['simple_means']['symbols'], types.ListType):
+            if 'symbols' in data['dict_result']['simple_means'].keys() and isinstance(
+                    data['dict_result']['simple_means']['symbols'], types.ListType):
                 for symbols in data['dict_result']['simple_means']['symbols']:
                     print '\n   "' + words + '"'
                     ps = ' - [读音]'
                     if 'ph_am' in symbols.keys() and symbols['ph_am'] is not None:
-                        ps += "  [美]:" + symbols['ph_am']
+                        ps += '  [美]:[' + symbols['ph_am'] + ']'
                     if 'ph_en' in symbols.keys() and symbols['ph_en'] is not None:
-                        ps += "  [英]:" + symbols['ph_en']
+                        ps += '  [英]:[' + symbols['ph_en'] + ']'
                     if 'ph_other' in symbols.keys() and symbols['ph_other'] is not None:
                         ps += '  ' + symbols['ph_other']
                     print ps
@@ -45,21 +47,23 @@ def translate(words, showEg):
                         for part in symbols['parts']:
                             if 'part' in part.keys() and 'means' in part.keys():
                                 print '   ' + part['part'], ';'.join(part['means'])
+                print ''
         if showEg:
             if 'collins' in data['dict_result'].keys() and data['dict_result']['collins'] is not None:
                 if 'entry' in data['dict_result']['collins'].keys() and isinstance(
                         data['dict_result']['collins']['entry'],
                         types.ListType):
-                    print "\n - - 例句 - -\n"
+                    print " - - 例句 - -\n"
                     for entry in data['dict_result']['collins']['entry']:
                         if 'value' in entry.keys() and len(entry['value']):
-                            for value in entry['value']:
-                                if 'tran' in value.keys() and 'def' in value.keys() and 'mean_type' in value.keys() and len(
-                                        value['mean_type']):
-                                    print ' - ' + value['tran']
-                                    print '   ' + value['def']
+                            for val in entry['value']:
+                                if 'tran' in val.keys() and val[
+                                    'tran'] != '' and 'def' in val.keys() and 'mean_type' in val.keys() and len(
+                                        val['mean_type']):
+                                    print ' - ' + val['tran']
+                                    print '   ' + val['def']
                                     print '   例句:'
-                                    for mean in value['mean_type']:
+                                    for mean in val['mean_type']:
                                         if 'example' in mean.keys():
                                             for example in mean['example']:
                                                 if 'tran' in example.keys() and 'ex' in example.keys():
@@ -79,6 +83,7 @@ def usage():
     print "  -e,  --example    显示例句"
     print ""
 
+
 opts, args = getopt.getopt(sys.argv[1:], "hve", ["help", "version", "example"])
 
 showEg = False
@@ -95,4 +100,3 @@ if len(args):
     translate(args[0], showEg)
 else:
     print '缺少要翻译的单词或语句'
-
