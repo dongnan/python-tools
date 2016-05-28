@@ -71,7 +71,7 @@ def translate(words, showEg):
                                                     print '        ' + example['ex']
                                     print ''
             else:
-                print "\n - 没有查询到相关例句.\n"
+                print " - 没有查询到相关例句.\n"
 
 
 def usage():
